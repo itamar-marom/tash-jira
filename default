@@ -1,0 +1,37 @@
+## Version 2020/03/05 - Changelog: https://github.com/linuxserver/docker-letsencrypt/commits/master/root/defaults/default
+
+# redirect all traffic to https
+server {
+	listen 80;
+	listen [::]:80;
+	server_name tashjira.ddns.net;
+	return 301 https://$host$request_uri;
+}
+
+
+upstream backend {
+        server 158.177.22.46:8080;
+    }
+
+# main server block
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+
+	server_name tashjira.ddns.net;
+
+
+	# all ssl related config moved to ssl.conf
+	include /config/nginx/ssl.conf;
+
+
+#	client_max_body_size 0;
+
+	location / {
+		proxy_pass http://backend;
+	}
+}
+
+
+

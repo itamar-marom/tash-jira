@@ -1,0 +1,62 @@
+# JIRA SOFTWARE COMPOSE-FILE
+version: '3'
+
+services:
+    jira-software:
+        image: 'atlassian/jira-software:8.4.0'
+        ports: 
+            - '8080:8080'
+        environment: 
+                JVM_MINIMUM_MEMORY: '1g'
+                JVM_MAXIMUM_MEMORY: '20g'
+                ATL_JDBC_URL: 'jdbc:postgresql://localhost:5432/jira-db'
+                ATL_JDBC_USER: 'jira'
+                ATL_JDBC_PASSWORD: 'jiradbpass'
+                ATL_DB_DRIVER: 'org.postgresql.Driver'
+                ATL_DB_TYPE: 'postgres72'
+        volumes:
+            - './jira/jira-data:/var/atlassian/application-data/jira'
+            - './jira/jira-logs:/var/atlassian/application-data/jira/log'
+            - './jira/jira-tomcat-logs:/opt/atlassian/jira/logs'
+              # - './jira/jira-tomcat-conf:/opt/atlassian/jira/conf'
+            - './server.xml:/opt/atlassian/jira/conf/server.xml'
+        depends_on: 
+            - 'jira-postgresql'
+
+    jira-postgresql:
+        image: 'postgres'
+        ports: 
+            - '5432:5432'
+        environment: 
+            POSTGRES_DB: 'jira-db'
+            POSTGRES_USER: 'jira'
+            POSTGRES_PASSWORD: 'jiradbpass'
+        volumes:
+            - './postgresql/postgresql-data:/var/lib/postgresql/data'
+
+    jira-ddclient:
+        image: 'linuxserver/ddclient'
+        environment:
+            PUID: '0'
+            PGID: '0'
+            TZ: 'America/Chicago'
+        volumes:
+            - './ddclient-config:/config'
+            - './ddclient.conf:/config/ddclient.conf'
+ 
+    letsencrypt:
+        image: 'linuxserver/letsencrypt'
+        cap_add:
+            - NET_ADMIN
+        environment:
+          PUID: '0'
+          PGID: '0'
+          TZ: 'America/Chicago'
+          URL: 'tashjira.ddns.net'
+          VALIDATION: 'http'
+        volumes:
+          - './letsencrypt-config:/config'
+          - './default:/config/nginx/site-confs/default'
+        ports:
+          - '443:443'
+          - '80:80'
