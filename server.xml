@@ -21,9 +21,9 @@
                redirectPort="8443"
                acceptCount="10"
                secure="false"
-               scheme="http"
-               proxyName=""
-               proxyPort=""
+               scheme="https"
+               proxyName="tashjira.ddns.net"
+               proxyPort="443"
 
                relaxedPathChars="[]|"
                relaxedQueryChars="[]|{}^\`&quot;&lt;&gt;"
